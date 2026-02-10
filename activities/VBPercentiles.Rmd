@@ -37,6 +37,7 @@ team_aces |> mutate(percentile = ntile(total_aces, 100))
 
 Write a couple of sentences that puts Maryland into context with the other teams in the dataset. You can do some Internet research to help with this.
 
+Maryland falls into the 95th percentile of the NCAA women's volleyball teams, with a total of 223 aces. This means that 95 percent of the other NCAA women's volleyball teams fall below Maryland, while 5 percent of the teams are above. The percentile is based off the total number of aces, so Maryland had more aces than 95% of the other NCAA teams, which is impressive. However, while the total number of aces is a strong indicator for a highly competitive volleyball team, the percentile does not necessarily equate to wins. So some teams above Maryland may be in a higher percentile for aces, but have the same season record, since aces are not the only way you can win a game.
 
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
