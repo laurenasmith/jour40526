@@ -9,6 +9,7 @@ In this assignment, we will be working with a dataset containing information abo
 You will need to load the tidyverse library
 
 ```{r}
+library(tidyverse)
 ```
 
 Then you'll load the data from the web. The URL for the data is: https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/white_house_salaries_2025.csv. You will create a dataframe called `wh_salaries` that contains the data from this URL.
@@ -16,12 +17,13 @@ Then you'll load the data from the web. The URL for the data is: https://raw.git
 ### Task 2: Load the Data and Describe It
 
 ```{r}
+wh_salaries <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/white_house_salaries_2025.csv")
 ```
 ### Task 3: Describe the Data
 
 You should examine that dataframe carefully by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the categories of incidents. From a reporting standpoint, what stands out to you about this data? Are there any salary values that will cause problems for analysis?
 
-ANSWER HERE
+The data set includes employee names and their position titles, as well as their annual salaries. There are a small amount of positions where the salary value is 0. This obviously can't be true for an employee. A reporter might wonder whether due to the nature of these positions, the salaries are classified. If so, why? These missing values could also make accurate data analysis more difficult. 
 
 ### Task 4: Calculate the Mean and Median of the Salaries
 
