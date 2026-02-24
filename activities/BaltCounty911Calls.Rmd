@@ -74,7 +74,7 @@ summary(daily_calls$call_count)
 
 Let's visualize the time series of daily calls. What patterns do you see? If you had to draw horizontal lines that would highlight unusual days, where would those lines be?
 
-ANSWER HERE
+The greatest outliers occur in early October, as well as New Year's Day. Spring levels are consistently high. There is a notable drop around January 2023 at the end of the graph. 
 
 ```{r daily-calls-plot}
 # Plot daily call volume
@@ -137,7 +137,7 @@ unusual_days |>
 
 Let's visualize these unusual days in the context of the full dataset. How do they differ from your answer on Task 3?
 
-ANSWER HERE
+The unusually low data points show that there is a general pattern of decrease in the later months of 2022 going into 2023. The unusually high data points show that the consistently higher call counts are in both Spring and Summer.
 
 ```{r plot-unusual-days}
 # Create a clean factor for the plot legend
@@ -207,7 +207,7 @@ ggplot(dow_summary, aes(x = day_of_week, y = avg_calls)) +
 
 We can also calculate z-scores that account for the day of the week pattern. How would you describe the day with the highest z-score without using the term "z-score"?
 
-ANSWER HERE
+The day with the highest number of calls is Tuesday, October 2022. This is an outlier, and particularly odd, given that Tuesdays have a relatively lower average number of calls compared to the average number of calls on the weekends. 23 calls, the number recorded on this Tuesday in October, is more than double the average amount of calls per day recorded in this year.
 
 ```{r day-of-week-z-scores}
 # Calculate day-of-week adjusted z-scores
@@ -298,5 +298,5 @@ top_outliers |> kable(digits = 2)
 
 Based on our z-score analysis, what are some potential angles for reporting? What would your next steps be and what would you tell an editor about your findings?
 
-ANSWER HERE
+I definitely think that the two close dates in July are interesting, as they do suggest a bad/laced batch of fentanyl or some other drug that was causing overdoses. I also think that one of the highest dates being New Year's Day is interesting, I would want to see if I could compare it to other years to see if this is an enduring trend, or if New Year's Day in 2023 was just generally an outlier.
 
