@@ -6,26 +6,68 @@ In this assignment, you'll be picking up where you left off with the M&Ms activi
 
 ### Task 1: Load the tidyverse
 
+```{r}
+library(tidyverse)
+```
+
+
 
 ### Task 2: Load the M&Ms dataset from https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv
+
+```{r}
+MMs <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/heads/main/data/mandms.csv")
+```
 
 
 ### Task 3: Sample 5 rows of data from the dataset
 
+```{r}
+set.seed(42) 
+
+sample_5 <- MMs |> sample_n(5)
+```
+
+
 
 ### Task 4: Calculate the mean age and standard deviation of the sample, using either the blue or white number of M&Ms
 
+```{r}
+sample_stats <- sample_5 |>
+  summarise(
+    mean_black = mean(black),
+    sd_black = sd(black)
+  )
+
+sample_stats
+```
+
+
 
 ### Task 5: Calculate the mean age and standard deviation of the population, using the same measure as in Task 4
+
+```{r}
+population_stats <- MMs |>
+  summarise (
+    mean_black = mean(black),
+    sd_black = sd(black)
+  )
+
+population_stats
+```
 
 
 ### Task 6: Compare the sample and population statistics
 
 Compare the two sets of means and standard deviations. Are they similar?
 
+The mean and standard deviations differ greatly between the sample and the population.
+
 ### Task 7: Describe the results
 
 Write a few sentences about what you found in the data. What does this tell you about the M&Ms dataset and about the act of random sampling?
+
+
+The data shows that there was great variation in the amount of black M&Ms found in each groups sample. The average amount of black M&Ms in the sample was higher in the sample, but the standard deviation was lower. The data demonstrates how random sampling, while a worthwhile method, can still in some cases, be misleading when trying to draw conclusions from data. This also shows that in order for random sampling to be as accurate as possible, the sample size needs to be large enough. 5 rows is not enough for us to be confident that it is representative of the population.
 
 
 When finished, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
