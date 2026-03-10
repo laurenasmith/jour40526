@@ -191,11 +191,11 @@ Let's calculate z-scores that account for day of week patterns based on the same
 accidents <- accidents |>
   group_by(day_of_week) |>
   mutate(
-    dow_mean = REPLACE_ME,
-    dow_sd = REPLACE_ME,
-    dow_z_score = (REPLACE_ME - REPLACE_ME) / REPLACE_ME
-  ) |>
-  ungroup()
+    dow_mean = mean(total),
+    dow_sd = sd(total),
+    dow_z_score = (total - dow_mean) / dow_sd)
+
+
 
 # Find days with unusual day-of-week z-scores
 unusual_dow <- accidents |>
@@ -212,7 +212,7 @@ unusual_dow |>
 ### Task 7 (3 points)
 Compare the days that have extreme z-scores overall versus those with extreme day-of-week z-scores. How do these lists differ? What journalistic insights can you draw from comparing these two different approaches to measuring "unusual" days?
 
-ANSWER HERE
+The overall extreme z-scores list has a lot of weekend dates, while the day-of-week z-scores list has mostly weekdays. I would say that the day-of-week z-scores list offers more insight because it demonstrates true abnormalities since the data shows that weekdays on average have less and more consistent rates of car accidents. It shows how many sds away from their specific day-of-week mean certain individual days are. So these dates may not relatively be extreme overall, but their are unusual for the time of week in which they occur.
 
 Let's see how many unusual days we have for each day of the week:
 
@@ -291,7 +291,7 @@ unusual_monthly |>
 ### Task 8 (2 points)
 Based on the monthly pattern analysis, which months have the highest and lowest average accidents? Develop a hypothesis about why these seasonal patterns exist.
 
-ANSWER HERE
+October has the highest average of accidents while January has the lowest. I imagine that in October, when the sun is starting to set earlier, around maybe peak rush hour times, more accidents are common. For January, I am not sure. I suppose it is right after the holiday season, so maybe the normal hustle and bustle of daily life has not returned in full.
 
 ## Identifying Extreme Outliers
 
@@ -316,9 +316,15 @@ if(nrow(extreme_outliers) > 0) {
 ### Task 9 (2 points)
 For the extreme outliers identified (z-scores beyond ±3), what do they have in common?
 
-ANSWER HERE
+All of them except the one Monday are on the weekend (counting Friday). Also 7 out of the 12 dates happened in 2021.
 
 ## Your Best Story Pitch
 
 ### Task 10 (5 points)
 Based on all the analyses performed, craft your best story pitch, including a headline and lede. Be sure to include what kinds of sources/people you'd talk to for the story.
+
+I would want to pitch a story about the overall unusually high rate of car accidents in 2021. I would talk to police as well as those who collected the data. I would also want to speak to actual PG County drivers about what they were seeing and encountering on the road. I would want to get a sense from them, as well as those responding to the accidents, of what the main causes and concerns were. How many of these accidents were minor? Fatal? What were the primary causes? 
+
+Headline: 2021 Saw Sharp Increase in Car Accidents for Prince George's County
+
+Lede: According to data collected by Prince George's county, an unusual amount of car accidents occurred in 2021. This year had some of the county's highest daily accident counts in the past couple years, including a count of 58 accidents on Friday, October 29th.
