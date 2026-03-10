@@ -23,14 +23,16 @@ wh_salaries <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/
 
 You should examine that dataframe carefully by clicking on it in the Environment tab in RStudio. Write a couple of sentences describing the categories of incidents. From a reporting standpoint, what stands out to you about this data? Are there any salary values that will cause problems for analysis?
 
-The data set includes employee names and their position titles, as well as their annual salaries. There are a small amount of positions where the salary value is 0. This obviously can't be true for an employee. A reporter might wonder whether due to the nature of these positions, the salaries are classified. If so, why? These missing values could also make accurate data analysis more difficult. 
+The data set includes employee names and their position titles, as well as their annual salaries. There are a small amount of positions where the salary value is 0. This obviously can't be true for an employee. A reporter might wonder whether due to the nature of these positions, the salaries are classified. If so, why? Because there are only a small amount of these cases, I don't know how much they would impact data analysis, but it is better to not have missing values at all. 
 
 ### Task 4: Calculate the Mean and Median of the Salaries
 
 Write code to calculate the mean and median of the salaries in the dataset using the `summarize()` function. You don't need to make a new dataframe, just display the results.
 
 ```{r}
+wh_salaries |> summarize(mean(SALARY))
 
+wh_salaries |> summarize(median(SALARY))
 ```
 
 ### Task 5: Add in the minimum and maximum salaries
@@ -38,6 +40,17 @@ Write code to calculate the mean and median of the salaries in the dataset using
 Take the code you just wrote and add in the minimum and maximum salaries (the functions for that are `min()` and `max()`). Your results should show four columns: mean_salary, median_salary, min_salary, max_salary.
 
 ```{r}
+wh_salaries |> summarize(min(SALARY))
+
+wh_salaries |> summarize(max(SALARY))
+
+wh_salaries |> mutate(mean_salary= mean(SALARY))
+
+wh_salaries |> mutate(median_salary= median(SALARY))
+
+wh_salaries |> mutate(min_salary= min(SALARY))
+
+wh_salaries |> mutate(max_salary= max(SALARY))
 
 ```
 
@@ -45,10 +58,10 @@ Take the code you just wrote and add in the minimum and maximum salaries (the fu
 
 Write a couple of sentences describing the results of your analysis. What do the mean and median salaries tell you about the data? What do the minimum and maximum salaries tell you? Are there any outliers in the data?
 
-ANSWER HERE
+The mean salary is slightly higher than the median salary, which means the data is slightly skewed to the right. The minimum salary is 0, which is an outlier, which as I stated previously, is highly unlikely to be true. It is not unreasonable to assume that rather than these positions having no salary, the values are simply missing.
 
 ### Task 7: Story Idea
 
 Based on the data, what is your best story idea? What is the next step you would take to develop that story idea?
 
-ANSWER HERE
+I am most interested in the employees whose salary is listed as 0. I would want to know what their actual positions are and if their wages are classified, and if so, why? Are they not actually salaried workers and paid hourly? The problem is I don't know how to go about finding this information. I guess because this data is public information I could reach out to them directly.
