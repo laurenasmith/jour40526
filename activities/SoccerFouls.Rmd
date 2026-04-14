@@ -49,5 +49,26 @@ matches |>
 
 ### Task 6: Describe the results of both the correlation calculation and the scatterplot.
 
+Both the correlation and the scatterplot show that there is no correlation between fouls and goal differential.
+
+
+
+
+
+### Task 7: Choose another variable and repeat the steps in Tasks 4-5, then describe the result.
+
+
+```{r}
+matches |> summarize(correlation = cor(sh_att, goal_diff, method="pearson"))
+```
+
+```{r}
+matches |> 
+  ggplot() +
+  geom_point(aes(x=goal_diff, y=sh_att)) +
+  geom_smooth(aes(x=goal_diff, y=sh_att), method="lm")
+```
+
+This shows that there is a correlation between shot attempts and goal differential.
 
 When you are done, save your work, switch to GitHub Desktop, then add, commit and push your changes to GitHub and submit the URL of the notebook in ELMS.
