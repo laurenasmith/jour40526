@@ -46,19 +46,19 @@ ggplot(nonvoters_data, aes(x = weight)) +
 
 **Question 1:** Most weights cluster near 1.0, but some are much higher or lower. What does a weight of 0.2 tell you about that respondent's group in the sample? What about a weight of 3.5? Why might a pollster assign such extreme weights?
 
-ANSWER HERE
+A weight of 0.2 tells me that the respondent's group is overrepresented in the sample. while a weight of 3.5 suggests that the respondent's group is very underrepresented. A pollster would assign these weights to make sure that the responses of all groups are considered equally in the data analysis, especially if the representation in the sample is very unbalanced.
 
 ## Task 2: Education Distribution in the Sample (3 points)
 
 ```{r education-distribution}
 nonvoters_data |>
-  count(REPLACE_ME) |>
+  count(educ) |>
   mutate(percentage = round(n / sum(n) * 100, 1))
 ```
 
 **Question 2:** College graduates are overrepresented in most surveys. Does that appear to be true here? Why might college graduates be more likely to respond to a survey than people with less education?
 
-ANSWER HERE
+This does appear to be true for this survey. College graduates might respond more because they have a different appreciation for polling and data collection. They also may care more about politics and be more engaged in the idea of both polling and voting.
 
 ## Task 3: Unweighted Voting Intentions by Education (4 points)
 
@@ -87,7 +87,7 @@ unweighted_summary
 
 **Question 3:** Based only on these unweighted numbers, write a one-sentence headline for a story about education and voting intentions.
 
-ANSWER HERE
+Survey Results Show that College Graduates Are More Likely To Vote In The Upcoming Election
 
 ## Task 4: Weighted Voting Intentions by Education (2 points)
 
@@ -97,7 +97,7 @@ Now apply the weights. Instead of counting respondents, we sum their weights —
 weighted_by_education <- nonvoters_data |>
   filter(!is.na(Q21), Q21 > 0, !is.na(educ)) |>
   group_by(educ, Q21) |>
-  summarize(weighted_count = sum(REPLACE_ME), .groups = "drop_last") |>
+  summarize(weighted_count = sum(weight), .groups = "drop_last") |>
   mutate(weighted_total = sum(weighted_count),
          weighted_percentage = weighted_count / weighted_total * 100) |>
   ungroup()
@@ -125,7 +125,7 @@ viz_data <- bind_rows(
   weighted_by_education |>
     filter(Q21 == 1) |>
     mutate(Type = "Weighted",
-           percentage = REPLACE_ME) |>
+           percentage = weighted_percentage) |>
     select(Type, educ, percentage)
 )
 
@@ -145,7 +145,7 @@ ggplot(viz_data, aes(x = educ, y = percentage, fill = Type)) +
 
 **Question 4:** Which education group shows the biggest shift between weighted and unweighted results? In percentage points, how large is that shift? Does weighting change the story, or does it just change the exact numbers?
 
-ANSWER HERE
+The group of respondents with a high school degree or less show the biggest difference between weighted and unweighted results. The shift is a little under 3%. The weighting changes the exact numbers, but it does not change the story.
 
 ## Task 6: The UMD Belonging Survey (8 points)
 
@@ -153,4 +153,9 @@ Earlier in class this week, we looked at the 2024 UMD Belonging and Community Su
 
 **Question 5:** Based on what you've learned in this assignment, write 2-3 paragraphs as if you were a reporter evaluating the UMD survey before writing a story based on it. Address: (1) what the lack of weighting means for how you'd use the results, (2) which groups in the UMD survey appeared most underrepresented based on Figures 1 and 2, and (3) what question you would ask the survey's authors before publishing.
 
-ANSWER HERE
+
+I think the lack of weighting would make it difficult to use the results of the survey given that it is not properly representative of the campus population. However, I think that some findings from it could be used as long as this weighting issue was disclosed.
+
+Men are pretty underrepresented in the sample based on Figure 1 while Hispanic/Latinx people are the most underrepresented in Figure 2. 
+
+Before publishing, I would ask the authors about why they decided not to do any weighting. I also would ask in which specific areas they considered the population and sample to be statistically different, and whether they feel that difference had a real impact on the validity of the survey. As we discussed, there can be significant statistical difference that doesn't actually end up having real world impact.
