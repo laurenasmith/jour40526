@@ -26,7 +26,7 @@ teams <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/main/
 Next, we construct a linear model to analyze how different factors like `Yards Gained`, `Takeaways`, and `Points Scored` influence the number of wins. This model helps us quantify the relationships and assess which factors are significant predictors of success.
 
 ```{r}
-model <- lm(Wins ~ `Yards Gained` + Takeaways + `Points Scored`, data = teams)
+model <- lm(Wins ~ Takeaways + Giveaways + `Yards Allowed` + `Points Scored`, data = teams)
 summary(model)
 ```
 
@@ -54,7 +54,7 @@ The coefficients tell us the estimated effect of each independent variable on th
 
 Is this a useful model, based on what you've seen? Why?
 
-ANSWER HERE
+I would say this is a somewhat useful model, but it could definitely be improved. The p-values for each of the variables show that only one has any statistically significant impact on wins, and the coefficient shows that impact to be small. All of the coefficients are pretty low, which means that the relationship between the variables is not strong. The adjusted r-squared value shows that a moderate amount of the variance is explained by this model. While you could use this model, I think it would be better to use a model that includes different variables for better results.
 
 ## Correlation Analysis
 
@@ -80,8 +80,11 @@ The results from our correlation analysis show the strength of the relationships
 
 Which of these three factors - Yards Gained, Takeaways and Points Scored - have the most impact on wins? Are there any that do not seem impactful at all?
 
-ANSWER HERE
+Yards Gained seems to not be impactful at all when it comes to wins, the least impactful in fact. The best model I tried includes all factors but excludes Yards Gained. Points scored seems to have the biggest impact on wins, as including it with the other variables, with the exception of Yards Gained, improves the model.
 
 ## Using the Model (3 points)
 
 Without using the words "multiple regression model", describe how you could use this model to cover a team or game.
+
+
+This model can be used to understand how different aspects of football performance impact the number of wins. So I can look at an NFL team and see how often the teams with the most points scored end up winning the most games. Ultimately, I can look at a team's pattern of actions like Takeaways or Giveaways and predict how their season will go/end. This can be useful when covering teams, and thus, predicting who will win a game between two teams.
