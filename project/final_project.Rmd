@@ -1,0 +1,21 @@
+---
+title: "R Notebook"
+
+---
+
+
+
+```{r}
+library(tidyverse)
+
+```
+
+This dataset is the first one I included in my Data Background Assignment. It has 30,000 songs sourced from the Spotify Web API. It has 23 variable columns that are each for a different song characteristic. The link to the Kaggle page where I found the data is here (https://www.kaggle.com/datasets/joebeachcapital/30000-spotify-songs/data?select=spotify_songs.csv). The data card on Kaggle provides definitions/descriptions of each variable that explains how the variable is measured. I don't see where it says what specific timeframe the dataset covers.
+
+```{r}
+spotify<- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv")
+```
+The variable columns that will be the most useful to me are track popularity, duration in milliseconds, tempo, valence, liveness, instrumentalness, acousticness, speechiness, loudness, energy and danceability. I want to look at the relationship between track popularity and individual song characteristics. I do not foresee using the other variables a lot. However, it might be cool to compare years since the dataset includes the release dates for the albums that each track is on. 
+
+
+
