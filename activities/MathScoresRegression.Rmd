@@ -16,7 +16,7 @@ We have school-level data from Montgomery County, Pa. that includes each school'
 ### Loading the Data
 
 ```{r}
-schools <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/refs/heads/main/montgomery_pa.csv")
+schools_pa <- read_csv("https://raw.githubusercontent.com/dwillis/jour405_files/refs/heads/main/montgomery_pa.csv")
 ```
 
 ### Task 1: Examine the Data Before You Plot Anything
@@ -59,7 +59,7 @@ The scatterplot shows no clear trend, and the regression line does not represent
 Let's build the linear regression model using all schools.
 
 ```{r}
-model <- lm(`% Met or Exceeded Math Expectations` ~ `FARMS Pct`, data = schools)
+model_pa <- lm(`% Met or Exceeded Math Expectations` ~ `FARMS Pct`, data = schools)
 summary(model)
 ```
 

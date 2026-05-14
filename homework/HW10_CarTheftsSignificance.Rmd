@@ -10,6 +10,8 @@ You previously calculated the mean, margin of error and confidence interval for 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # LOAD THE TIDYVERSE
+
+library(tidyverse)
 ```
 
 ```{r}
@@ -24,7 +26,7 @@ car_thefts <- read_csv("https://raw.githubusercontent.com/dwillis/jour405/refs/h
 
 We'll split the monthly data into two halves, and then ask whether there's a statistically significant difference between these periods. To do that, we'll use a t-test with our alpha at 0.05. First, fill in the hypotheses, then replace the REPLACE_ME values in the code.
 
-**Null Hypothesis:** REPLACE_ME
+**Null Hypothesis:** 
 
 **Alternative Hypothesis:** REPLACE_ME
 

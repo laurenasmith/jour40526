@@ -1,0 +1,430 @@
+---
+title: "R Notebook"
+
+---
+
+#Tests I Will Run
+
+For this project, I plan to run several linear regression models to assess the relationships between individual song characteristics and song popularity. The residuals from a linear regression model would also allow me to see which songs over or under-performed in comparison to the relationship demonstrated by the regression line.
+
+I also plan to run a multiple regression model. I feel as though this is necessary because there are so many variables, and most of them are individual song characteristics. Each song will contain different levels of each of these elements, so I want to see what combination is correlated with the higher popularity. Additionally, since I assume that certain characteristics are related (ex. energy and danceability), I want to try a correlation matrix to see which variables are closely related to each other. This will also improve my multiple regression models, as I will know which variables I should avoid putting in the same model.
+
+From looking further at the data, I see that the dataset covers songs from 1957 to 2020. I had an idea about observing each of these elements by year and/or decade. I think it would be interesting to conduct a t-test to compare averages of certain variables from decade to decade. Does a song from the 2000s have a significantly different average duration or instrumentalness than a song from the 70s.
+
+
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(corrplot)
+```
+
+This dataset is the first one I included in my Data Background Assignment. It has 30,000 songs sourced from the Spotify Web API. It has 23 variable columns that are each for a different song characteristic. The link to the Kaggle page where I found the data is here (https://www.kaggle.com/datasets/joebeachcapital/30000-spotify-songs/data?select=spotify_songs.csv). The data card on Kaggle provides definitions/descriptions of each variable that explains how the variable is measured. I don't see where it says what specific timeframe the dataset covers.
+
+```{r}
+spotify_30000 <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv")
+```
+The variable columns that will be the most useful to me are track popularity, duration in milliseconds, tempo, valence, liveness, instrumentalness, acousticness, speechiness, loudness, energy and danceability. I want to look at the relationship between track popularity and individual song characteristics. I do not foresee using the other variables a lot. However, it might be cool to compare years since the dataset includes the release dates for the albums that each track is on. 
+
+#Trials, Errors and Lessons
+
+I ran most of the code I plan to include in the final, so this became a rough draft of sorts.
+
+I do not think I will end up including the t-test, as this notebook is already so long. I also thought that a t-test would make more sense when comparing average scores between decades, but I could not figure out how to create a decade column.
+
+I ran into little to no trouble with the regression models, but they all, even the various multiple regression models, were not useful at all in predicting track popularity. I took this to mean that track popularity is simply too complicated and unpredictable for my models. 
+
+
+
+#Hypotheses
+
+**Hypothesis 1:** As song duration decreases, track popularity increases.
+
+**Hypothesis 2:** Throughout the years, track duration has decreased.
+
+**Hypothesis 3:** Danceability and valence predict popularity more than acoustic features like loudness and tempo, accounting for release year.
+
+
+
+
+#Definitions
+First, I am going to list the variables from the data set I will be focusing on, and their descriptions, as provided in Kaggle. 
+
+**track_popularity**: Song Popularity (0-100) where higher is better
+
+**track_album_release_date**: Date when album released
+
+**danceability**: Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+
+**energy**: Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.
+
+**loudness**: The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typical range between -60 and 0 db.
+
+**acousticness**: A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic (meaning that the track uses natural instruments rather than electronic production).
+
+**instrumentalness**: Predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.
+
+**valence**: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
+
+**tempo**: The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration.
+
+**duration_ms**: Duration of song in milliseconds
+
+
+
+#Track Popularity Descriptive Statistics and Analysis
+
+Since I am ultimately attempting to predict what contributes most to song popularity, I want to summarize the track popularity scores.
+
+```{r}
+spotify_30000 |> summarize(mean_track_popularity = mean(track_popularity), sd_track_popularity = sd(track_popularity), median_track_popularity = median(track_popularity))
+```
+I am creating a histogram to see the spread of popularity scores.
+
+```{r}
+spotify_30000|> 
+  ggplot() + 
+  geom_histogram(aes(x = track_popularity), binwidth = 10) +
+  geom_vline(aes(xintercept = mean(track_popularity)), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(track_popularity) - sd(track_popularity)), color = "blue", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(track_popularity) + sd(track_popularity)), color = "blue", linetype = "dashed", size = 1)
+```
+
+Both the summary and the histogram show that track popularity scores are negatively skewed. This means that there are lower outliers drawing the mean slightly below the median.
+
+#Adding duration columns
+
+I feel as though the duration data will be easier to digest and understand when in seconds or minutes rather than milliseconds.
+
+```{r}
+spotify_30000 <- spotify_30000 |> mutate((duration_s = (duration_ms)/1000))
+
+spotify_30000 |> mutate (duration_m = (duration_s)/60)
+```
+
+# Track Duration Descriptive Statistics and Analysis
+
+I want to summarize and visualize track duration in minutes the same way I did track popularity.
+
+```{r}
+spotify_30000 |> summarize(mean_duration = mean(duration_m), sd_duration = sd(duration_m), median_duration = median(duration_m))
+```
+```{r}
+spotify_30000|> 
+  ggplot() + 
+  geom_histogram(aes(x = duration_m), binwidth = 0.1) +
+  geom_vline(aes(xintercept = mean(duration_m)), color = "red", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(duration_m) - sd(duration_m)), color = "blue", linetype = "dashed", size = 1) +
+  geom_vline(aes(xintercept = mean(duration_m) + sd(duration_m)), color = "blue", linetype = "dashed", size = 1)
+```
+
+We can see that the data is positively skewed, with higher outliers pulling the mean above the median. Most songs are of below average duration.
+
+
+
+#Other Variables Descriptive Stats and Analysis
+I am going to summarize the descriptive stats of the other song characteristic variables, including song duration, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence and tempo.
+```{r}
+spotify_30000 |> summarize(mean_danceability = mean(danceability), sd_danceability = sd(danceability), median_danceability = median(danceability))
+ 
+spotify_30000 |> summarize(mean_energy = mean(energy), sd_energy = sd(energy), median_energy = median(energy))
+
+spotify_30000 |> summarize(mean_loudness = mean(loudness), sd_loudness = sd(loudness), median_loudness = median(loudness))
+
+spotify_30000 |> summarize(mean_acousticness = mean(acousticness), sd_acousticness = sd(acousticness), median_acousticness = median(acousticness))
+
+spotify_30000 |> summarize(mean_instrumentalness = mean(instrumentalness), sd_instrumentalness = sd(instrumentalness), median_instrumentalness = median(instrumentalness))
+
+spotify_30000 |> summarize(mean_valence = mean(valence), sd_valence = sd(valence), median_valence = median(valence))
+
+spotify_30000 |> summarize(mean_tempo = mean(tempo), sd_tempo = sd(tempo), median_tempo = median(tempo))
+```
+#Variable Analysis
+
+The data for danceability, energy, loudness, valence and tempo is negatively skewed, while the data for instrumentalness, acousticness, and duration is positively skewed.
+
+
+
+
+#Adding time columns
+I want to explore these variables through time, so I am adding a column for the song release year.
+
+```{r}
+spotify_30000 |> mutate(release_year = year (as_date(track_album_release_date)))
+
+```
+
+I want to also create a column for release decade, because I feel as though it will make it easier to analyze change through decades rather than individual years, but I am not sure how to do that.
+
+```{r}
+
+```
+
+
+
+
+#Relationship between track release year and track duration
+
+First, since this is an individual inquiry, I am going to examine the relationship between release year and duration through a scatterplot and a regression model.
+
+```{r}
+spotify_30000 |> 
+  ggplot() +
+  geom_point(aes(x=release_year, y=duration_m)) +
+  geom_smooth(aes(x=release_year, y=duration_m), method="lm")
+```
+
+
+**Scatterplot Analysis**
+
+The regression line shows a downward trend, supporting one of my hypotheses that track duration has decreased through time. However, the actual data points are not represented well by the regression line. Part of the issue seems to be that there is simply more data in the later years, so there are more songs of varying length that may be pulling the regression line down. Thus I feel like I need to run an actual regression model to better understand whether there is a relationship or not.
+
+**Regression Model**
+
+```{r}
+model_duration_year<- lm(`duration_m` ~ `release_year`, data = spotify_30000)
+summary(model_duration_year)
+```
+
+The p-value is very small, indicating a statistically significant relationship between release year and track duration. However, both the adjusted r-squared and coefficient are low, close to zero, which lets me know the relationship is not strong. While, as previously stated, the model could be skewed by the fact that there is more data/songs for recent years, the results could also indicate that the ratio of long songs to short songs has not actually changed much over the years, despite how it may seem to me.
+
+
+
+
+
+
+#Relationships between track popularity and individual variables
+
+I am choosing to analyze duration, danceability, valence and instrumentalness, as I hypothesize that those will have the most impact on popularity. For each variable, I am going to create a scatterplot visualizing the relationship, and then run a regression model for more detail.
+
+**Track Popularity and Track Duration**
+```{r}
+spotify_30000 |> 
+  ggplot() +
+  geom_point(aes(x=duration_m, y=track_popularity)) +
+  geom_smooth(aes(x=duration_m, y=track_popularity), method="lm")
+```
+
+The regression line shows a moderate decrease in popularity as duration increases, but the data is not represented by this line and shows no clear trend. A moderately negative relationship is implied by the line.
+
+```{r}
+model_duration_popularity<- lm(`track_popularity` ~ `duration_m`, data = spotify_30000)
+summary(model_duration_popularity)
+```
+The p-value is low, so the relationship is statistically significant. The coefficient suggests a moderately strong negative relationship, which supports my original exploratory question, which was "Are shorter songs more popular on Spotify?" However, the adjusted r-squared value shows us that only 2% of the variation in popularity can be explained by track duration, so my original claim is ultimately not supported.
+
+**Track Popularity and Danceability**
+
+```{r}
+spotify_30000 |> 
+  ggplot() +
+  geom_point(aes(x=danceability, y=track_popularity)) +
+  geom_smooth(aes(x=danceability, y=track_popularity), method="lm")
+```
+
+The regression line shows a very slight increase, but the data shows no clear trend, and is not represented by the regression line. A weak positive relationship is implied by the line.
+
+```{r}
+model_danceability_popularity<- lm(`danceability` ~ `valence`, data = spotify_30000)
+summary(model_danceability_popularity)
+```
+The p-value is very low, meaning the relationship is statistically significant. However, the coefficient is close to zero (0.2) indicating that the positive relationship between the two variables is weak. The adjusted r-squared is also low, with only 10% of the variation in popularity explained by danceability scores.
+
+
+**Track Popularity and Valence**
+
+```{r}
+spotify_30000 |> 
+  ggplot() +
+  geom_point(aes(x=valence, y=track_popularity)) +
+  geom_smooth(aes(x=valence, y=track_popularity), method="lm")
+```
+
+The regression line shows a very slight increase, but the data points show no clear trend or relationship. A very weak positive relationship is implied by the line.
+
+```{r}
+model_valence_popularity<- lm(`track_popularity` ~ `valence`, data = spotify_30000)
+summary(model_valence_popularity)
+```
+The p-value is very small, indicating a statistically significant relationship between the two variables. The coefficent of 3.56 indicates a relatively strong positive relationship, suggesting that the more positiveness conveyed in a song, the higher its popularity will be. However, the adjusted r-squared value is very low. Less than 1% of the variation in popularity is explained by the valence of the track.
+
+**Track Popularity and Instrumentalness**
+
+```{r}
+spotify_30000 |> 
+  ggplot() +
+  geom_point(aes(x=instrumentalness, y=track_popularity)) +
+  geom_smooth(aes(x=instrumentalness, y=track_popularity), method="lm")
+```
+
+The regression line implies a relatively weak negative relationship between instrumentalness and key popularity, but same as the other variables, the data points do not follow the trend suggested by the regression line. The highest popularity scores do seem to rest mostly around 0.00 instrumentalness though. This may suggest that the most popular songs are ones with a high level of vocal content.
+
+
+```{r}
+model_instrumental_popularity<- lm(`track_popularity` ~ `instrumentalness`, data = spotify_30000)
+summary(model_instrumental_popularity)
+```
+
+The p-value is very small, so we know there is a statistically significant relationship between the two variables. The coefficient is -16, which suggests a strong negative relationship between instrumentalness and popularity, which I would assume, since the lower the instrumentalness score, the more vocal content is in the song. Songs with higher instrumentalness scores are more likely to be mostly only instrumentation. However, the adjusted r-squared is 0.02, which is very low, meaning that only roughly 2% of the variation in track popularity is explained by instrumentalness. Thus, we can deduce that instrumentalness alone does not predict popularity much at all.
+
+
+
+All of the variables I tested have low r-squared values, so I do not see the value in looking at residuals, since the variables do not accurately predict or explain track popularity.
+
+
+
+
+
+#Multiple Regression
+
+The variables I assumed would predict populartiy were ultimately shown by the regression model to explain little of the variation in track popularity scores. It is likely that track popularity is better predicted by a combination of the variables given that each song will have a varying levels of each. Each characteristic comes together to produce the full experience of a song, so it makes more sense to use a multiple regression model to try and explain popularity.
+
+
+**Correlation Matrix**
+
+Before I try to run various models, I am going to do a correlation matrix, to see if any of the variables are strongly correlated with each other. This will help me to decide whether or not to take them out of certain models.
+
+```{r}
+corr_matrix <- cor(selected_vars)
+corrplot(corr_matrix, method = "circle")
+```
+
+The correlation suggests that none of the variables are super strongly correlated. Energy and acousticness have a moderate negative correlation while energy and loudness have a moderate positive correlation, but those are the only two correlations worth noting. So it is suggested that energy and loudness might partially predict of each other, meaning an increase in one is correlated with an increase in the other. The matrix also suggests that that acousticness and energy might be predictors of each other, but in the opposite way. An increase in acousticness, meaning less electronic production and more natural instruments, is correlated with decrease in the energy of the track. These two correlations make sense because the energy score is based on activity and intensity, and a higher score means a track is louder, noisier and faster. 
+
+It is interesting to note that none of the variables have a notable correlation with track popularity. This leads me to further assume that only a combination of variables can predict song popularity.
+
+
+
+
+**Multiple Regression Model**
+
+```{r}
+#First I will run a model with all variables.
+
+model_spotify <- lm(track_popularity ~  + release_year + duration_m + instrumentalness + valence + danceability + energy + loudness + acousticness + tempo, data = spotify_30000)
+summary(model_spotify)
+```
+#Model Analysis
+
+**Residuals**
+
+The residuals median is not that close to zero, which suggests that the model is not perfectly centered around the actual data points. 
+
+The residuals max and min are very high, suggesting a lot of error in predictions. The max popularity score is 100, so an error of prediction by 70 is way too high. The min being -58 while the max is 70 also means that the errors are not evenly distributed around zero.
+
+
+**Coefficients**
+
+*release_year*: The coefficient is close to zero, suggesting that release year has a negligible impact on track popularity. The coefficient is statistically significant though, which suggests that there is a significant relationship between release year and track popularity. I find this to be counterintuitive and assume this is an error in the model.
+
+*duration_m*: The coefficient is statistically significant, and suggests that each additional minute of song duration is associated with a decrease in popularity of about 2.65. Put simply, longer songs are suggested to be less popular than shorter songs
+
+*instrumentalness*: The coefficient is statistically significant, and suggests that each increase in instrumentalness is associated with a decrease of roughly 11 points in a songs popularity. Put simply, the less vocal content in a song, the less popular it is implied to be.
+
+*valence*: The coefficient is statistically significant and suggests that each increase in valence score is associated with an increase of 3.19 in popularity. Put simply, the more positiveness in a song, the more popular it is likely to be.
+
+*danceability*: The coefficient is statistically significant and suggests that an increase in danceability score is associated with an increase of 5.03 in popularity. Put simply, the more a song is suited for dancing, the more popular it is likely to be.
+
+*energy*: The coefficient is statistically significant, and suggests that increase in energy is associated with a decrease of roughly 31 points in popularity. This is surprising, because I would have expected that higher energy predicted higher popularity, but this suggests the opposite. The coefficient is almost suspiciously extreme which makes me wonder if this is an error in prediction by the model.
+
+*loudness*: The coefficient is statistically significant, and suggests that each increase in loudness is associated with an increase of 1.63 in track popularity. This is interesting, because loudness is one of the characteristics taken into account when giving energy scores. It is odd that their correlation coefficients are so different.
+
+*acousticness*: The coefficient is statistically significant, and suggests that increase in acousticness is associated with an increase of 3.27 in popularity. Put simply, less electronic production/amplified instrumentation is more likely to make a song more popular. I find this surprising and interesting. When I think of recent popular songs, in the 21st century let's say, not many of them are mostly or purely acoustic.
+
+*tempo*: The coefficient is statistically significant, and suggests that an increase in tempo is associated with an increase of 0.02 in popularity. Being so close to zero, it suggests that tempo is not a reliable predictor of song popularity
+
+
+
+**Model Fit**
+
+*Residual Standard Error*: The RSE of 24.02 tells us that the typical prediction by the model deviates from the actual number popularity score by about 24.02 units. This means any predictions from this model are likely not accurate.
+
+*Adjusted R-squared*: 0.0739 is the R-squared adjusted for the number of predictors and indicates that about 7.39% of the variance is explained by the model after accounting for the number of variables used. This is very low, indicating that the model does not explain the variance.
+
+*F-statistic*: The F-statistic (275.4) has a low p-value, making it statistically significant. This would suggest that the model is effective in explaining variance in track popularity, which is at odds with what is implied by the standard error and r-squared.
+
+
+
+
+#Alternate Multiple Regression Models
+
+I tried different variations of the model to see if any of them were more reliable for predicting track popularity
+
+```{r}
+# Model 2
+spotify_model2 <- lm(track_popularity ~ danceability + energy + loudness + valence + acousticness + instrumentalness + tempo + release_year, data = spotify_30000)
+summary(spotify_model2)
+
+# Model 3
+spotify_model3 <- lm(track_popularity ~ loudness + acousticness + instrumentalness + tempo + release_year, data = spotify_30000)
+summary(spotify_model3)
+
+# Model 4
+spotify_model4 <- lm(track_popularity ~ danceability + energy + valence + release_year, data = spotify_30000)
+summary(spotify_model4)
+
+# Model 5
+spotify_model5 <- lm(track_popularity ~ danceability + energy + loudness + valence + acousticness + instrumentalness + tempo, data = spotify_30000)
+summary(spotify_model5)
+
+# Model 6
+spotify_model6 <- lm(track_popularity ~ loudness + acousticness + instrumentalness + tempo, data = spotify_30000)
+summary(spotify_model6)
+
+# Model 7
+spotify_model7 <- lm(track_popularity ~ danceability + energy + valence, data = spotify_30000)
+summary(spotify_model7)
+
+# Model 8
+spotify_model8 <- lm(track_popularity ~ danceability + energy + duration_m + valence + release_year, data = spotify_30000)
+summary(spotify_model8)
+
+# Model 9
+spotify_model9 <- lm(track_popularity ~ loudness + acousticness + instrumentalness + tempo + duration_m + release_year, data = spotify_30000)
+summary(spotify_model9)
+
+# Model 10
+spotify_model10 <- lm(track_popularity ~ danceability + valence + release_year + duration_m, data = spotify_30000)
+summary(spotify_model10)
+
+# Compare models
+cat("Model 1 (Full model) - Adjusted R-squared:", summary(model_spotify)$adj.r.squared, "\n")
+cat("Model 2 - Adjusted R-squared:", summary(spotify_model2)$adj.r.squared, "\n")
+cat("Model 3 - Adjusted R-squared:", summary(spotify_model3)$adj.r.squared, "\n")
+cat("Model 4 - Adjusted R-squared:", summary(spotify_model4)$adj.r.squared, "\n")
+cat("Model 5 - Adjusted R-squared:", summary(spotify_model5)$adj.r.squared, "\n")
+cat("Model 6 - Adjusted R-squared:", summary(spotify_model6)$adj.r.squared, "\n")
+cat("Model 7 - Adjusted R-squared:", summary(spotify_model7)$adj.r.squared, "\n")
+cat("Model 8 - Adjusted R-squared:", summary(spotify_model8)$adj.r.squared, "\n")
+cat("Model 9 - Adjusted R-squared:", summary(spotify_model9)$adj.r.squared, "\n")
+cat("Model 10 - Adjusted R-squared:", summary(spotify_model10)$adj.r.squared, "\n")
+
+# Create comparison chart
+model_names <- c("Full model", "Model 2", "Model 3", "Model 4", "Model 5", "Model 6", "Model 7", "Model 8", "Model 9", "Model 10")
+adj_r_squared <- c(summary(model_spotify)$adj.r.squared,
+                   summary(spotify_model2)$adj.r.squared,
+                   summary(spotify_model3)$adj.r.squared,
+                   summary(spotify_model4)$adj.r.squared,
+                   summary(spotify_model5)$adj.r.squared,
+                   summary(spotify_model6)$adj.r.squared,
+                   summary(spotify_model7)$adj.r.squared,
+                   summary(spotify_model8)$adj.r.squared,
+                   summary(spotify_model9)$adj.r.squared,
+                   summary(spotify_model10)$adj.r.squared)
+
+model_comparison <- data.frame(Model = model_names, Adjusted_R_squared = adj_r_squared)
+ggplot(model_comparison, aes(x = reorder(Model, Adjusted_R_squared), y = Adjusted_R_squared)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Model Comparison by Adjusted R-squared",
+       x = "Model")
+```
+
+None of the alternative models I tried were more reliable than the full model, which already wasn't very reliable at all. My conclusion is that song popularity takes heavily relies on variables like artist popularity, which is not concluded in this dataset and is hard to quantify. There are other factors such as the Spotify algorithm and its playlist suggestions, which push certain songs. Even the catchiness of the lyrics can play a role. The results suggest that acoustic characteristics cannot accurately predict song popularity. 
+
+Another likely reason that song popularity cannot be fully predicted is that listeners have different music tastes. When people's consumption of music was centered around what played on the radio, people's idea of a "good" or popular song was likely more homogenous and formulaic. Streaming apps like Spotify allow listeners to curate their own musical diet. There are some songs on the Billboard top 10 that I have never listened to, because it is not in my rotation of music that I like to listen to. Even if Spotify suggests it to me via playlist, I may choose not to listen. Certain songs may be popular only among certain demographics.
+
+As a journalist or researcher, if I were writing about how certain songs become popular or get more streams on Spotify, I would first analyze more Spotify data, given that I only used one dataset here. I would also want to talk to someone from Spotify about how the playlists are created and how the algorithm suggests certain songs. I think it would be interesting to do some polling to better understand whether people actually listen to "popular" songs suggested by the Spotify algorithm, or to see how many people listen to the songs on the Billboard top 10.
+
+I think it is an uphill battle trying to report on what individual characteristics of a song will make it popular given that musical preferences are so subjective. What I think is more interesting is writing about how popularity is determined in the streaming era, and how a song becomes popular more than what makes it popular. This is especially interesting when looking at artists who had breakout hits.
+

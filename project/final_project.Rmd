@@ -1,34 +1,18 @@
 ---
-title: "R Notebook"
-
+title: "Final Project Submission"
 ---
-
-#Tests I Will Run
-
-For this project, I plan to run several linear regression models to assess the relationships between individual song characteristics and song popularity. The residuals from a linear regression model would also allow me to see which songs over or under-performed in comparison to the relationship demonstrated by the regression line.
-
-I also plan to run a multiple regression model. I feel as though this is necessary because there are so many variables, and most of them are individual song characteristics. Each song will contain different levels of each of these elements, so I want to see what combination is correlated with the higher popularity. Additionally, since I assume that certain characteristics are related (ex. energy and danceability), I want to try a correlation matrix to see which variables are closely related to each other. This will also improve my multiple regression models, as I will know which variables I should avoid putting in the same model.
-
-From looking further at the data, I see that the dataset covers songs from 1957 to 2020. I had an idea about observing each of these elements by year and/or decade. I think it would be interesting to conduct a t-test to compare averages of certain variables from decade to decade. Does a song from the 2000s have a significantly different average duration or speechiness than a song from the 70s.
 
 
 
 ```{r}
 library(tidyverse)
-
+library(corrplot)
+library(lubridate)
 ```
 
-This dataset is the first one I included in my Data Background Assignment. It has 30,000 songs sourced from the Spotify Web API. It has 23 variable columns that are each for a different song characteristic. The link to the Kaggle page where I found the data is here (https://www.kaggle.com/datasets/joebeachcapital/30000-spotify-songs/data?select=spotify_songs.csv). The data card on Kaggle provides definitions/descriptions of each variable that explains how the variable is measured. I don't see where it says what specific timeframe the dataset covers.
 
 ```{r}
-spotify<- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-21/spotify_songs.csv")
+
 ```
-The variable columns that will be the most useful to me are track popularity, duration in milliseconds, tempo, valence, liveness, instrumentalness, acousticness, speechiness, loudness, energy and danceability. I want to look at the relationship between track popularity and individual song characteristics. I do not foresee using the other variables a lot. However, it might be cool to compare years since the dataset includes the release dates for the albums that each track is on. 
-
-
-
-
-
-
 
 
